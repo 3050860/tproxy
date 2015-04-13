@@ -12,7 +12,7 @@ from gevent import coros
 from gevent import socket
 import greenlet
 
-from .server import ServerConnection, InactivityTimeout
+from .server import InactivityTimeout
 from .util import parse_address, is_ipv6
 from .sendfile import async_sendfile
 
@@ -166,17 +166,19 @@ class ClientConnection(object):
                 raise ConnectionError(
                         "socket error while connectinng: [%s]" % str(e))
 
-        self.remote = addr
-        self.connected = True
+        #self.remote = addr
+        #self.connected = True
         log.debug("Successful connection to %s:%s" % addr)
 
         if self.buf and self.route.empty_buf:
             self.send_data(sock, self.buf)
+            data = sock.recv(1024)
+            self.sock.sendall(data)
             self.buf = []
 
-        server = ServerConnection(sock, self, 
-                timeout=inactivity_timeout, extra=extra, buf=self.buf)
-        server.handle()
+        #server = ServerConnection(sock, self, 
+        #        timeout=inactivity_timeout, extra=extra, buf=self.buf)
+        #server.handle()
 
 def _closesocket(sock):
     try:
